@@ -34,18 +34,24 @@ resource "aws_security_group" "my_security_group" {
 }
 
 resource "aws_instance" "tf_test_instance" {
+  for_each = tomap({
+    tf_test_instance_micro = "t2.micro"
+    tf_test_instance_medium = "t2.medium"
+  })
+
+  depends_on = [ aws_security_group.my_security_group, aws_key_pair.tf_key ]
   key_name        = "tf"
   security_groups = [aws_security_group.my_security_group.name]
-  instance_type   = var.ec2_instance_type
-  ami             = "ami-06b6e5225d1db5f46"
-  user_data = file("install_nginx.sh")
+  instance_type   = each.value
+  ami             = var.ec2-ami_id
+  user_data       = file("install_nginx.sh")
 
   root_block_device {
-    volume_size = 15
+    volume_size = var.ec2_root_storage_size
     volume_type = "gp3"
   }
   tags = {
-    Name = "tf-learnings"
+    Name = each.key
   }
 }
 
