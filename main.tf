@@ -34,10 +34,12 @@ resource "aws_security_group" "my_security_group" {
 }
 
 resource "aws_instance" "tf_test_instance" {
-  key_name        = aws_key_pair.tf_key.key_name
+  key_name        = "tf"
   security_groups = [aws_security_group.my_security_group.name]
   instance_type   = var.ec2_instance_type
-  ami             = "ami-0af9569868786b23a"
+  ami             = "ami-06b6e5225d1db5f46"
+  user_data = file("install_nginx.sh")
+
   root_block_device {
     volume_size = 15
     volume_type = "gp3"
